@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shree Chamunda Trust | NGO Support Chatbot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .chatbot-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .chatbot-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #b17f60;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .chatbot-button:hover {
+            transform: scale(1.1);
+            background-color: #b17f60;
+        }
+        
+        .chatbot-window {
+            width: 350px;
+            height: 500px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: none;
+            flex-direction: column;
+        }
+        
+        .chatbot-header {
+            background-color: #b17f60;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chatbot-messages {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        
+        .chatbot-input {
+            padding: 15px;
+            border-top: 1px solid #b17f60;
+            display: flex;
+        }
+        
+        .chatbot-input input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #b17f60;
+            border-radius: 5px;
+            outline: none;
+        }
+        
+        .chatbot-input button {
+            margin-left: 10px;
+            padding: 10px 15px;
+            background-color: #b17f60;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 15px;
+        }
+        
+        .bot-message {
+            background-color: #f3f4f6;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .user-message {
+            background-color: #000000;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease forwards;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #b17f60;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b17f60;
+        }
+        
+        /* Hero section gradient */
+        .hero-gradient {
+            background: linear-gradient(135deg, #cc5a34 0%, #a0887f 100%);
+        }
+        
+        /* Section hover effect */
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .service-card {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-hands-helping text-orange-500 text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-gray-800">Shree Chamunda Trust</span>
+                    </div>
+                </div>
+                <div class="hidden md:ml-6 md:flex md:items-center md:space-x-8">
+                    <a href="#about" class="text-gray-700 hover:text-orange-500 px-3 py-2 text-sm font-medium">About Us</a>
+                    <a href="#services" class="text-gray-700 hover:text-orange-500 px-3 py-2 text-sm font-medium">Our Services</a>
+                    <a href="#programs" class="text-gray-700 hover:text-orange-500 px-3 py-2 text-sm font-medium">Programs</a>
+                    <a href="#chatbot" class="text-gray-700 hover:text-orange-500 px-3 py-2 text-sm font-medium">Chatbot Guide</a>
+                    <a href="#contact" class="text-gray-700 hover:text-orange-500 px-3 py-2 text-sm font-medium">Contact</a>
+                    <button class="bg-orange-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 transition duration-300">
+                        Donate Now
+                    </button>
+                </div>
+                <div class="-mr-2 flex items-center md:hidden">
+                    <button type="button" id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
+                        <span class="sr-only">Open main menu</span>
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div class="hidden md:hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#about" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-orange-500 hover:bg-gray-50">About Us</a>
+                <a href="#services" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-orange-500 hover:bg-gray-50">Our Services</a>
+                <a href="#programs" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-orange-500 hover:bg-gray-50">Programs</a>
+                <a href="#chatbot" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-orange-500 hover:bg-gray-50">Chatbot Guide</a>
+                <a href="#contact" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-orange-500 hover:bg-gray-50">Contact</a>
+                <button class="w-full mt-2 bg-orange-500 text-white px-4 py-2 rounded-md text-base font-medium hover:bg-indigo-700 transition duration-300">
+                    Donate Now
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
+            <div class="md:flex md:items-center md:justify-between">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <h1 class="text-4xl md:text-5xl font-bold leading-tight mb-6">Empowering Communities Through Technology</h1>
+                    <p class="text-xl mb-8">Our AI-powered Support Chatbot is here to help you access our services, programs, and resources anytime, anywhere.</p>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <button class="bg-white text-orange-500 px-6 py-3 rounded-md font-medium hover:bg-gray-100 transition duration-300">
+                            Try Our Chatbot
+                        </button>
+                        <button class="border-2 border-white text-white px-6 py-3 rounded-md font-medium hover:bg-white hover:text-orange-500 transition duration-300">
+                            Learn About Our Work
+                        </button>
+                    </div>
+                </div>
+                <div class="md:w-1/2 flex justify-center">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3349/3349179.png" alt="Chatbot illustration" class="w-64 h-64 md:w-80 md:h-80">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Us Section -->
+    <section id="about" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">About Shree Chamunda Trust</h2>
+                <div class="w-20 h-1 bg-orange-500 mx-auto mb-6"></div>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">We are a non-profit organization dedicated to bridging the gap between communities and essential services through innovative technology solutions.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-gray-50 p-8 rounded-lg">
+                    <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-bullseye text-orange-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Our Mission</h3>
+                    <p class="text-gray-600">To empower underserved communities by providing accessible information, resources, and support through technology-driven solutions.</p>
+                </div>
+                
+                <div class="bg-gray-50 p-8 rounded-lg">
+                    <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-heart text-orange-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Our Values</h3>
+                    <p class="text-gray-600">Compassion, Innovation, Inclusivity, Transparency, and Community-Driven Impact guide everything we do.</p>
+                </div>
+                
+                <div class="bg-gray-50 p-8 rounded-lg">
+                    <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-users text-orange-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Who We Serve</h3>
+                    <p class="text-gray-600">We support marginalized communities, including low-income families, refugees, and individuals facing barriers to essential services.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Our Services</h2>
+                <div class="w-20 h-1 bg-orange-500 mx-auto mb-6"></div>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">Discover how our Support Chatbot enhances access to our comprehensive range of services.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="service-card bg-white p-8 rounded-lg shadow-md">
+                    <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-comments text-orange-500 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">24/7 Information Access</h3>
+                    <p class="text-gray-600 mb-4">Our chatbot provides instant answers to your questions about our programs, eligibility criteria, and application processes.</p>
+                    <div class="flex items-center text-orange-500 font-medium">
+                        <span>Learn more</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </div>
+                </div>
+                
+                <div class="service-card bg-white p-8 rounded-lg shadow-md">
+                    <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-calendar-check text-orange-500 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Program Registration</h3>
+                    <p class="text-gray-600 mb-4">Register for our programs directly through the chatbot interface, saving you time and paperwork.</p>
+                    <div class="flex items-center text-orange-500 font-medium">
+                        <span>Learn more</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </div>
+                </div>
+                
+                <div class="service-card bg-white p-8 rounded-lg shadow-md">
+                    <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-question-circle text-orange-500 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">FAQs & Support</h3>
+                    <p class="text-gray-600 mb-4">Get immediate help with common questions or be directed to the right human support when needed.</p>
+                    <div class="flex items-center text-orange-500 font-medium">
+                        <span>Learn more</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </div>
+                </div>
+                
+                <div class="service-card bg-white p-8 rounded-lg shadow-md">
+                    <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-language text-orange-500 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Multilingual Support</h3>
+                    <p class="text-gray-600 mb-4">Our chatbot communicates in multiple languages to serve diverse community members effectively.</p>
+                    <div class="flex items-center text-orange-500 font-medium">
+                        <span>Learn more</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </div>
+                </div>
+                
+                <div class="service-card bg-white p-8 rounded-lg shadow-md">
+                    <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-bell text-orange-500 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Program Updates</h3>
+                    <p class="text-gray-600 mb-4">Receive timely notifications about new programs, deadlines, and important announcements.</p>
+                    <div class="flex items-center text-orange-500 font-medium">
+                        <span>Learn more</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </div>
+                </div>
+                
+                <div class="service-card bg-white p-8 rounded-lg shadow-md">
+                    <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-hands-helping text-orange-500 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Community Resources</h3>
+                    <p class="text-gray-600 mb-4">Access curated resources and referrals to partner organizations through our chatbot.</p>
+                    <div class="flex items-center text-orange-500 font-medium">
+                        <span>Learn more</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Programs Section -->
+    <section id="programs" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Our Programs</h2>
+                <div class="w-20 h-1 bg-orange-500 mx-auto mb-6"></div>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">Explore our impactful programs designed to uplift and empower communities.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-indigo-50 rounded-lg overflow-hidden">
+                    <div class="p-8">
+                        <h3 class="text-2xl font-bold text-indigo-800 mb-4">Education Initiative</h3>
+                        <p class="text-gray-700 mb-6">Providing access to quality education resources, scholarships, and mentorship programs for underprivileged youth.</p>
+                        <div class="flex items-center text-orange-500 font-medium">
+                            <span>Ask our chatbot about eligibility</span>
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </div>
+                    </div>
+                    <div class="bg-indigo-100 px-8 py-6">
+                        <div class="flex items-center">
+                            <i class="fas fa-user-graduate text-orange-500 mr-3"></i>
+                            <span class="font-medium">1,200+ students supported annually</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-purple-50 rounded-lg overflow-hidden">
+                    <div class="p-8">
+                        <h3 class="text-2xl font-bold text-purple-800 mb-4">Food Security Program</h3>
+                        <p class="text-gray-700 mb-6">Ensuring access to nutritious meals through our community kitchens and food distribution networks.</p>
+                        <div class="flex items-center text-purple-600 font-medium">
+                            <span>Ask our chatbot about locations</span>
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </div>
+                    </div>
+                    <div class="bg-purple-100 px-8 py-6">
+                        <div class="flex items-center">
+                            <i class="fas fa-utensils text-purple-600 mr-3"></i>
+                            <span class="font-medium">15,000+ meals served monthly</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-green-50 rounded-lg overflow-hidden">
+                    <div class="p-8">
+                        <h3 class="text-2xl font-bold text-green-800 mb-4">Job Skills Training</h3>
+                        <p class="text-gray-700 mb-6">Vocational training and job placement assistance to help community members achieve financial stability.</p>
+                        <div class="flex items-center text-green-600 font-medium">
+                            <span>Ask our chatbot about upcoming workshops</span>
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </div>
+                    </div>
+                    <div class="bg-green-100 px-8 py-6">
+                        <div class="flex items-center">
+                            <i class="fas fa-briefcase text-green-600 mr-3"></i>
+                            <span class="font-medium">85% employment rate after completion</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 rounded-lg overflow-hidden">
+                    <div class="p-8">
+                        <h3 class="text-2xl font-bold text-blue-800 mb-4">Health & Wellness</h3>
+                        <p class="text-gray-700 mb-6">Free health screenings, mental health support, and wellness programs for the community.</p>
+                        <div class="flex items-center text-blue-600 font-medium">
+                            <span>Ask our chatbot about schedules</span>
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </div>
+                    </div>
+                    <div class="bg-blue-100 px-8 py-6">
+                        <div class="flex items-center">
+                            <i class="fas fa-heartbeat text-blue-600 mr-3"></i>
+                            <span class="font-medium">5,000+ health consultations yearly</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chatbot Guide Section -->
+    <section id="chatbot" class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Our Support Chatbot</h2>
+                <div class="w-20 h-1 bg-orange-500 mx-auto mb-6"></div>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">Your 24/7 assistant for all things Shree Chamunda Trust</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-6">How Our Chatbot Helps You</h3>
+                    
+                    <div class="space-y-6">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <div class="flex items-center justify-center h-10 w-10 rounded-md bg-orange-500 text-white">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-medium text-gray-800">Instant Access</h4>
+                                <p class="mt-1 text-gray-600">Get answers to your questions immediately, without waiting for office hours.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <div class="flex items-center justify-center h-10 w-10 rounded-md bg-orange-500 text-white">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-medium text-gray-800">Mobile Friendly</h4>
+                                <p class="mt-1 text-gray-600">Access our services from any device, anywhere you have internet connection.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <div class="flex items-center justify-center h-10 w-10 rounded-md bg-orange-500 text-white">
+                                    <i class="fas fa-user-shield"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-medium text-gray-800">Privacy Protected</h4>
+                                <p class="mt-1 text-gray-600">Your conversations are secure and we only collect necessary information to serve you better.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <div class="flex items-center justify-center h-10 w-10 rounded-md bg-orange-500 text-white">
+                                    <i class="fas fa-hand-holding-heart"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-medium text-gray-800">Human Backup</h4>
+                                <p class="mt-1 text-gray-600">When the chatbot can't help, it seamlessly connects you to our support team.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-6">Try Our Chatbot</h3>
+                    <p class="text-gray-600 mb-8">Here are some things you can ask our chatbot:</p>
+                    
+                    <div class="space-y-4">
+                        <button class="w-full text-left px-4 py-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition duration-300" onclick="sendSampleQuestion('What programs do you offer?')">
+                            <span class="font-medium text-gray-800">"What programs do you offer?"</span>
+                        </button>
+                        
+                        <button class="w-full text-left px-4 py-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition duration-300" onclick="sendSampleQuestion('How can I apply for the education program?')">
+                            <span class="font-medium text-gray-800">"How can I apply for the education program?"</span>
+                        </button>
+                        
+                        <button class="w-full text-left px-4 py-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition duration-300" onclick="sendSampleQuestion('Where is your nearest location?')">
+                            <span class="font-medium text-gray-800">"Where is your nearest location?"</span>
+                        </button>
+                        
+                        <button class="w-full text-left px-4 py-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition duration-300" onclick="sendSampleQuestion('What documents do I need to bring?')">
+                            <span class="font-medium text-gray-800">"What documents do I need to bring?"</span>
+                        </button>
+                    </div>
+                    
+                    <div class="mt-8 text-center">
+                        <button onclick="toggleChatbot()" class="bg-orange-500 text-white px-6 py-3 rounded-md font-medium hover:bg-indigo-700 transition duration-300">
+                            Open Chatbot Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-16 bg-orange-500 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4">Community Voices</h2>
+                <div class="w-20 h-1 bg-white mx-auto mb-6"></div>
+                <p class="text-lg max-w-3xl mx-auto">Hear what people are saying about our Support Chatbot</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white bg-opacity-10 p-8 rounded-lg backdrop-filter backdrop-blur-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="flex-shrink-0">
+                            <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/women/32.jpg" alt="User testimonial">
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="font-medium">Maria G.</h4>
+                            <div class="flex text-yellow-300">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="italic">"The chatbot helped me register for the food program in minutes. I didn't have to wait in line or make phone calls during work hours. It's a game-changer!"</p>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 p-8 rounded-lg backdrop-filter backdrop-blur-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="flex-shrink-0">
+                            <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/men/45.jpg" alt="User testimonial">
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="font-medium">James T.</h4>
+                            <div class="flex text-yellow-300">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="italic">"I was able to get all the information about the job training program at 11pm when I had time. The chatbot even scheduled an appointment for me with a counselor."</p>
+                </div>
+                
+                <div class="bg-white bg-opacity-10 p-8 rounded-lg backdrop-filter backdrop-blur-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="flex-shrink-0">
+                            <img class="h-10 w-10 rounded-full" src="https://randomuser.me/api/portraits/women/68.jpg" alt="User testimonial">
+                        </div>
+                        <div class="ml-4">
+                            <h4 class="font-medium">Aisha K.</h4>
+                            <div class="flex text-yellow-300">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="italic">"The chatbot speaks my language! As a new immigrant, it's hard to find services in my native tongue. This made me feel welcome and understood."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Contact Us</h2>
+                <div class="w-20 h-1 bg-orange-500 mx-auto mb-6"></div>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">We'd love to hear from you! Reach out through any of these channels.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-12">
+                <div>
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-6">Get In Touch</h3>
+                    
+                    <div class="space-y-6">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <div class="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-100 text-orange-500">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-medium text-gray-800">Our Office</h4>
+                                <p class="mt-1 text-gray-600">"Gatrad Krupa" Aaradhana Society<br>Shanala Road, Morbi - 363640</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <div class="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-100 text-orange-500">
+                                    <i class="fas fa-phone-alt"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-medium text-gray-800">Phone</h4>
+                                <p class="mt-1 text-gray-600">(+91) 9512013111<br>Mon-Fri, 11am-2pm</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <div class="flex items-center justify-center h-12 w-12 rounded-md bg-indigo-100 text-orange-500">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-medium text-gray-800">Email</h4>
+                                <p class="mt-1 text-gray-600">chamunda.trust2017@Gmail.com</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-10">
+                        <h4 class="text-lg font-medium text-gray-800 mb-4">Follow Us</h4>
+                        <div class="flex space-x-4">
+                            <a href="#" class="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-orange-500 hover:bg-indigo-100 transition duration-300">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-orange-500 hover:bg-indigo-100 transition duration-300">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-orange-500 hover:bg-indigo-100 transition duration-300">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-orange-500 hover:bg-indigo-100 transition duration-300">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-6">Send Us a Message</h3>
+                    
+                    <form class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                            <input type="text" id="name" name="name" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                            <input type="email" id="email" name="email" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        
+                        <div>
+                            <label for="subject" class="block text-sm font-medium text-gray-700">Subject</label>
+                            <select id="subject" name="subject" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                                <option>General Inquiry</option>
+                                <option>Program Information</option>
+                                <option>Partnership Opportunity</option>
+                                <option>Volunteer Inquiry</option>
+                                <option>Donation Question</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="message" class="block text-sm font-medium text-gray-700">Message</label>
+                            <textarea id="message" name="message" rows="4" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                        </div>
+                        
+                        <div>
+                            <button type="submit" class="w-full bg-orange-500 text-white py-3 px-4 rounded-md font-medium hover:bg-indigo-700 transition duration-300">
+                                Send Message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Shree Chamunda Trust</h3>
+                    <p class="text-gray-400">Empowering communities through technology and compassion since 2010.</p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#about" class="text-gray-400 hover:text-white transition duration-300">About Us</a></li>
+                        <li><a href="#services" class="text-gray-400 hover:text-white transition duration-300">Our Services</a></li>
+                        <li><a href="#programs" class="text-gray-400 hover:text-white transition duration-300">Programs</a></li>
+                        <li><a href="#chatbot" class="text-gray-400 hover:text-white transition duration-300">Chatbot Guide</a></li>
+                        <li><a href="#contact" class="text-gray-400 hover:text-white transition duration-300">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Legal</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Terms of Service</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Cookie Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Accessibility</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Newsletter</h3>
+                    <p class="text-gray-400 mb-4">Subscribe to our newsletter for updates on our programs and initiatives.</p>
+                    <form class="flex">
+                        <input type="email" placeholder="Your email" class="px-4 py-2 rounded-l-md focus:outline-none text-gray-800 w-full">
+                        <button type="submit" class="bg-orange-500 px-4 py-2 rounded-r-md hover:bg-indigo-700 transition duration-300">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm mb-4 md:mb-0">© 2023 Shree Chamunda Trust. All rights reserved.</p>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition duration-300">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Chatbot Widget -->
+    <div class="chatbot-container">
+        <div class="chatbot-window" id="chatbotWindow">
+            <div class="chatbot-header">
+                <div class="flex items-center">
+                    <i class="fas fa-robot mr-2"></i>
+                    <span>Shree Chamunda Trust Assistant</span>
+                </div>
+                <button onclick="toggleChatbot()" class="text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="chatbot-messages" id="chatbotMessages">
+                <div class="message bot-message fade-in">
+                    <p>Hello! I'm the Shree Chamunda Trust Assistant. How can I help you today?</p>
+                    <p class="text-xs text-gray-500 mt-2">Here are some things you can ask:</p>
+                    <ul class="text-xs text-gray-500 mt-1 list-disc list-inside">
+                        <li>What programs do you offer?</li>
+                        <li>How can I apply for assistance?</li>
+                        <li>Where are your locations?</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" id="chatbotInput" placeholder="Type your message here..." onkeypress="handleChatbotInput(event)">
+                <button onclick="sendChatbotMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+        <div class="chatbot-button" onclick="toggleChatbot()">
+            <i class="fas fa-robot text-2xl"></i>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+                
+                // Close mobile menu if open
+                const mobileMenu = document.getElementById('mobile-menu');
+                if (!mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        });
+
+        // Chatbot functionality
+        function toggleChatbot() {
+            const chatbotWindow = document.getElementById('chatbotWindow');
+            if (chatbotWindow.style.display === 'flex') {
+                chatbotWindow.style.display = 'none';
+            } else {
+                chatbotWindow.style.display = 'flex';
+            }
+        }
+
+        function sendChatbotMessage() {
+            const input = document.getElementById('chatbotInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                // Add user message
+                addMessage(message, 'user');
+                input.value = '';
+                
+                // Simulate bot response after a short delay
+                setTimeout(() => {
+                    const botResponse = getBotResponse(message);
+                    addMessage(botResponse, 'bot');
+                }, 500);
+            }
+        }
+
+        function handleChatbotInput(e) {
+            if (e.key === 'Enter') {
+                sendChatbotMessage();
+            }
+        }
+
+        function sendSampleQuestion(question) {
+            // Add user message
+            addMessage(question, 'user');
+            
+            // Simulate bot response after a short delay
+            setTimeout(() => {
+                const botResponse = getBotResponse(question);
+                addMessage(botResponse, 'bot');
+            }, 500);
+            
+            // Open chatbot if closed
+            const chatbotWindow = document.getElementById('chatbotWindow');
+            if (chatbotWindow.style.display !== 'flex') {
+                toggleChatbot();
+            }
+        }
+
+        function addMessage(text, sender) {
+            const messagesContainer = document.getElementById('chatbotMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender === 'bot' ? 'bot-message' : 'user-message', 'fade-in');
+            messageDiv.innerHTML = `<p>${text}</p>`;
+            messagesContainer.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function getBotResponse(userMessage) {
+            const lowerMessage = userMessage.toLowerCase();
+            
+            if (lowerMessage.includes('program') || lowerMessage.includes('service')) {
+                return "We offer several programs including Education Initiatives, Food Security, Job Skills Training, and Health & Wellness services. You can learn more about each program on our website or I can provide specific details about any that interest you.";
+            } else if (lowerMessage.includes('apply') || lowerMessage.includes('eligibility')) {
+                return "The application process varies by program. For most, you'll need to complete a simple form and provide some basic documentation. Would you like me to check which programs you might qualify for based on your situation?";
+            } else if (lowerMessage.includes('location') || lowerMessage.includes('where')) {
+                return "Our main office is at 123 Community Way, Cityville. We also have mobile service units that visit different neighborhoods. I can check our schedule to find the nearest location and time for you if you'd like.";
+            } else if (lowerMessage.includes('document') || lowerMessage.includes('need')) {
+                return "Common documents needed include proof of address, ID, and income information. The exact requirements depend on the program. For example, the food program requires less documentation than the job training program. Can I help you with a specific program?";
+            } else if (lowerMessage.includes('hour') || lowerMessage.includes('open')) {
+                return "Our main office is open Monday-Friday from 9am-5pm. However, our chatbot is available 24/7 to answer questions and our mobile services have varying hours. Would you like specific hours for a particular service?";
+            } else if (lowerMessage.includes('help') || lowerMessage.includes('support')) {
+                return "I'm here to help! I can provide information about our programs, help you with applications, connect you with resources, or transfer you to a human staff member if needed. What specifically can I assist you with today?";
+            } else {
+                return "I'm still learning, but I can help with information about our programs, services, locations, and application processes. Could you try asking your question in a different way or be more specific about what you need help with?";
+            }
+        }
+    </script>
+</body>
+</html>
